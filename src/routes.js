@@ -34,18 +34,13 @@ export const routes = (app, db) => {
     });
 
     app.post("/sign-in", async (req, res) => {
-        const {email, password} = req.body;
+        const { email, password } = req.body;
         const token = uuid();
 
         const activeUser = await users.findOne({ email });
+        const rightPassword = bcrypt.compareSync(password, activeUser?.password || "");
 
-        if (!activeUser) {
-            return res.status(401).send({ message: `invalid username or password` });
-        }
-
-        const rightPassword = bcrypt.compareSync(password, activeUser.password);
-
-        if (!rightPassword) {
+        if (!activeUser || !rightPassword) {
             return res.status(401).send({ message: `invalid username or password` });
         }
 
