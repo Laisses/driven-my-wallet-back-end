@@ -1,8 +1,10 @@
 import bcrypt from "bcrypt";
+import { v4 as uuid } from "uuid";
 import { validateUser } from "./validator.js";
 
 export const routes = (app, db) => {
     const users = db.collection("users");
+    const sessions = db.collection("sessions");
 
     app.post("/sign-up", async (req, res) => {
         const { username, email, password } = req.body;
@@ -31,4 +33,33 @@ export const routes = (app, db) => {
         res.sendStatus(201);
     });
 
+    app.post("/sign-in", async (req, res) => {
+        const {email, password} = req.body;
+        const token = uuid();
+
+        const activeUser = await users.findOne({ email });
+
+        if (!activeUser) {
+            return res.status(401).send({ message: `invalid username or password` });
+        }
+
+        const rightPassword = bcrypt.compareSync(password, activeUser.password);
+
+        if (!rightPassword) {
+            return res.status(401).send({ message: `invalid username or password` });
+        }
+
+        const userSession = await sessions.findOne({ userId: activeUser._id });
+
+        if (userSession) {
+            return res.status(401).send({ message: `this account is already logged in` });
+        }
+
+        await sessions.insertOne({
+            token,
+            userId: activeUser._id
+        });
+
+        res.status(200).send({ token });
+    });
 };
