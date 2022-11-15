@@ -10,6 +10,13 @@ const userSchema = Joi.object({
     repeat_password: Joi.ref("password")
 });
 
-export const validateUser = validator(userSchema);
+const transactionSchema = Joi.object({
+    title: Joi.string().min(3).required(),
+    amount: Joi.number().required(),
+    date: Joi.string().required(),
+    description: Joi.string(),
+    type: Joi.valid("inflow", "outflow")
+});
 
-//Joi.valid("message", "private_message")
+export const validateUser = validator(userSchema);
+export const validateTransaction = validator(transactionSchema);
