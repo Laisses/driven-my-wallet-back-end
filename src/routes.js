@@ -82,4 +82,28 @@ export const routes = (app, db) => {
 
     app.use(authMiddleware);
 
+    app.get("/transactions", async (req, res) => {
+        const activeUser = req.activeUser;
+
+        const mockTransactions = [
+            {
+                date: "30/10",
+                title: "Almoço mãe",
+                amount: "39,90"
+            },
+            {
+                date: "05/11",
+                title: "mercado",
+                amount: "524,58"
+            },
+            {
+                date: "15/11",
+                title: "Compra bolsa",
+                amount: "89,90"
+            }
+        ];
+
+        res.status(200).send({ mockTransactions, activeUser });
+    });
+
 };
