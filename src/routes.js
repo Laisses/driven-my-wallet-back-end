@@ -7,7 +7,7 @@ export const routes = (app, db) => {
     app.post("/sign-up", async (req, res) => {
         const { username, email, password } = req.body;
 
-        const userExists = await users.findOne({ "email": email });
+        const userExists = await users.findOne({ email });
 
         if (userExists) {
             return res.status(409).send({ message: "this email is already registered" });
