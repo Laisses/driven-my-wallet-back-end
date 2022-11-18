@@ -12,7 +12,7 @@ export const routes = (app, db) => {
         const transaction = req.body;
         const { error } = validator(transactionSchema, transaction);
 
-        if(error) {
+        if (error) {
             const errors = error.details.map((detail) => detail.message);
             return res.status(422).send(errors);
         }
@@ -101,7 +101,7 @@ export const routes = (app, db) => {
         const limit = req.query;
 
         const userTransactions = await transactions
-            .find({userId: user._id})
+            .find({ userId: user._id })
             .limit(Number(limit) || 0)
             .toArray();
 
@@ -127,11 +127,11 @@ export const routes = (app, db) => {
             _id: ObjectId(id)
         });
 
-        if(!transaction) {
+        if (!transaction) {
             res.sendStatus(404);
         }
 
-        await transactions.deleteOne({_id: ObjectId(id)});
+        await transactions.deleteOne({ _id: ObjectId(id) });
 
         res.status(200).send({ message: "Transação apagada com sucesso" });
     });
@@ -144,7 +144,7 @@ export const routes = (app, db) => {
             _id: ObjectId(id)
         });
 
-        if(!transaction) {
+        if (!transaction) {
             res.sendStatus(404);
         }
 
