@@ -14,8 +14,8 @@ const transactionSchema = Joi.object({
     title: Joi.string().min(3).required(),
     amount: Joi.number().required(),
     date: Joi.string().required(),
-    description: Joi.string(),
-    type: Joi.valid("inflow", "outflow")
+    description: Joi.string().valid(""),
+    type: Joi.valid("inflow", "outflow").required()
 });
 
 export const validateUser = validator(userSchema);
