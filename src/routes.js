@@ -1,10 +1,11 @@
 import bcrypt from "bcrypt";
 import { v4 as uuid } from "uuid";
-import { validateUser } from "./validator.js";
+import { validateUser, validateTransaction } from "./validator.js";
 
 export const routes = (app, db) => {
     const users = db.collection("users");
     const sessions = db.collection("sessions");
+    const transactions = db.collection("transactions");
 
     app.post("/sign-up", async (req, res) => {
         const { username, email, password } = req.body;
@@ -83,27 +84,30 @@ export const routes = (app, db) => {
     app.use(authMiddleware);
 
     app.get("/transactions", async (req, res) => {
-        const activeUser = req.activeUser;
+        const user = req.user;
 
-        const mockTransactions = [
-            {
-                date: "30/10",
-                title: "Almoço mãe",
-                amount: "39,90"
-            },
-            {
-                date: "05/11",
-                title: "mercado",
-                amount: "524,58"
-            },
-            {
-                date: "15/11",
-                title: "Compra bolsa",
-                amount: "89,90"
-            }
-        ];
+        const userTransactions = await transactions.find({userId: user._id}).toArray();
 
-        res.status(200).send({ mockTransactions, activeUser });
+        res.status(200).send({ userTransactions });
+    });
+
+    app.post("/transactions", async (req, res) => {
+        const userId = req.user._id;
+        const transaction = req.body;
+
+        const { error } = validateTransaction(transaction);
+
+        if(error) {
+            const errors = error.details.map((detail) => detail.message);
+            return res.status(422).send(errors);
+        }
+
+        await transactions.insertOne({
+            userId,
+            ...transaction
+        });
+
+        res.sendStatus(201);
     });
 
 };
