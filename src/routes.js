@@ -1,12 +1,24 @@
 import bcrypt from "bcrypt";
 import { ObjectId } from "mongodb";
 import { v4 as uuid } from "uuid";
-import { validateUser, validateTransaction } from "./validator.js";
+import { validator, userSchema, transactionSchema } from "./validator.js";
 
 export const routes = (app, db) => {
     const users = db.collection("users");
     const sessions = db.collection("sessions");
     const transactions = db.collection("transactions");
+
+    const validateTransactionSchemaMiddleware = (req, res, next) => {
+        const transaction = req.body;
+        const { error } = validator(transactionSchema, transaction);
+
+        if(error) {
+            const errors = error.details.map((detail) => detail.message);
+            return res.status(422).send(errors);
+        }
+
+        next();
+    };
 
     app.post("/sign-up", async (req, res) => {
         const { username, email, password } = req.body;
@@ -17,7 +29,7 @@ export const routes = (app, db) => {
             return res.status(409).send({ message: "this email is already registered" });
         }
 
-        const { error } = validateUser(req.body);
+        const { error } = validator(userSchema, req.body);
 
         if (error) {
             const errors = error.details.map(detail => detail.message);
@@ -92,16 +104,9 @@ export const routes = (app, db) => {
         res.status(200).send({ userTransactions });
     });
 
-    app.post("/transactions", async (req, res) => {
+    app.post("/transactions", validateTransactionSchemaMiddleware, async (req, res) => {
         const userId = req.user._id;
         const transaction = req.body;
-
-        const { error } = validateTransaction(transaction);
-
-        if(error) {
-            const errors = error.details.map((detail) => detail.message);
-            return res.status(422).send(errors);
-        }
 
         await transactions.insertOne({
             userId,
@@ -114,12 +119,20 @@ export const routes = (app, db) => {
     app.delete("/transactions/:id", async (req, res) => {
         const { id } = req.params;
 
+        const transaction = await transactions.findOne({
+            _id: ObjectId(id)
+        });
+
+        if(!transaction) {
+            res.sendStatus(404);
+        }
+
         await transactions.deleteOne({_id: ObjectId(id)});
 
         res.status(200).send({ message: "Transação apagada com sucesso" });
     });
 
-    app.put("/transactions/:id", async (req, res) => {
+    app.put("/transactions/:id", validateTransactionSchemaMiddleware, async (req, res) => {
         const { id } = req.params;
         const editedTransaction = req.body;
 
@@ -129,13 +142,6 @@ export const routes = (app, db) => {
 
         if(!transaction) {
             res.sendStatus(404);
-        }
-
-        const { error } = validateTransaction(editedTransaction);
-
-        if(error) {
-            const errors = error.details.map((detail) => detail.message);
-            return res.status(422).send(errors);
         }
 
         await transactions.updateOne(
