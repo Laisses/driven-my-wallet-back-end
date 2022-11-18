@@ -1,4 +1,5 @@
 import bcrypt from "bcrypt";
+import { ObjectId } from "mongodb";
 import { v4 as uuid } from "uuid";
 import { validateUser, validateTransaction } from "./validator.js";
 
@@ -76,7 +77,7 @@ export const routes = (app, db) => {
 
         delete activeUser.password;
 
-        req.activeUser = activeUser;
+        req.user = activeUser;
 
         return next();
     };
@@ -108,6 +109,14 @@ export const routes = (app, db) => {
         });
 
         res.sendStatus(201);
+    });
+
+    app.delete("/transactions/:id", async (req, res) => {
+        const { id } = req.params;
+
+        await transactions.deleteOne({_id: ObjectId(id)});
+
+        res.status(200).send({ message: "Transação apagada com sucesso" });
     });
 
 };
