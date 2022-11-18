@@ -98,8 +98,12 @@ export const routes = (app, db) => {
 
     app.get("/transactions", async (req, res) => {
         const user = req.user;
+        const limit = req.query;
 
-        const userTransactions = await transactions.find({userId: user._id}).toArray();
+        const userTransactions = await transactions
+            .find({userId: user._id})
+            .limit(Number(limit) || 0)
+            .toArray();
 
         res.status(200).send({ userTransactions });
     });
