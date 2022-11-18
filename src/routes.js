@@ -98,7 +98,7 @@ export const routes = (app, db) => {
 
     app.get("/transactions", async (req, res) => {
         const user = req.user;
-        const limit = req.query;
+        const { limit } = req.query;
 
         const userTransactions = await transactions
             .find({ userId: user._id })
