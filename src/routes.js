@@ -119,4 +119,31 @@ export const routes = (app, db) => {
         res.status(200).send({ message: "Transação apagada com sucesso" });
     });
 
+    app.put("/transactions/:id", async (req, res) => {
+        const { id } = req.params;
+        const editedTransaction = req.body;
+
+        const transaction = await transactions.findOne({
+            _id: ObjectId(id)
+        });
+
+        if(!transaction) {
+            res.sendStatus(404);
+        }
+
+        const { error } = validateTransaction(editedTransaction);
+
+        if(error) {
+            const errors = error.details.map((detail) => detail.message);
+            return res.status(422).send(errors);
+        }
+
+        await transactions.updateOne(
+            { _id: transaction._id },
+            { $set: editedTransaction }
+        );
+
+        res.status(200).send({ message: "Transação editada com sucesso" });
+    });
+
 };
