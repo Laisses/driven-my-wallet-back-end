@@ -109,6 +109,20 @@ export const routes = (app, db) => {
         res.status(200).send(userTransactions);
     });
 
+    app.get("/transactions/:id", async (req, res) => {
+        const { id } = req.params;
+
+        const transaction = await transactions.findOne({
+            _id: ObjectId(id)
+        });
+
+        if (!transaction) {
+            res.sendStatus(404);
+        }
+
+        res.status(200).send(transaction);
+    });
+
     app.post("/transactions", validateTransactionSchemaMiddleware, async (req, res) => {
         const userId = req.user._id;
         const transaction = req.body;
