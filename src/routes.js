@@ -106,7 +106,7 @@ export const routes = (app, db) => {
             .limit(Number(limit) || 0)
             .toArray();
 
-        res.status(200).send({ userTransactions });
+        res.status(200).send(userTransactions);
     });
 
     app.post("/transactions", validateTransactionSchemaMiddleware, async (req, res) => {
