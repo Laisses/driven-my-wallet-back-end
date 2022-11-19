@@ -157,4 +157,11 @@ export const routes = (app, db) => {
         res.status(200).send({ message: "Transação editada com sucesso" });
     });
 
+    const errorMiddleware = (err, _req, res, _next) => {
+        console.log(err);
+        res.sendStatus(500);
+    };
+
+    app.use(errorMiddleware);
+
 };
