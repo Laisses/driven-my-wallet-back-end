@@ -58,6 +58,7 @@ export const routes = (app, db) => {
             return res.status(401).send({ message: `invalid username or password` });
         }
 
+        const username = activeUser.username;
         const userSession = await sessions.findOne({ userId: activeUser._id });
 
         if (userSession) {
@@ -69,7 +70,7 @@ export const routes = (app, db) => {
             userId: activeUser._id
         });
 
-        res.status(200).send({ token });
+        res.status(200).send({ token, username });
     });
 
     const authMiddleware = async (req, res, next) => {
