@@ -80,6 +80,10 @@ export const singleTransaction = async (req, res) => {
         res.sendStatus(404);
     }
 
+    if (transaction.userId !== req.user._id) {
+        res.sendStatus(403);
+    }
+
     res.status(200).send(transaction);
 };
 
@@ -106,6 +110,10 @@ export const removeTransaction = async (req, res) => {
         res.sendStatus(404);
     }
 
+    if (transaction.userId !== req.user._id) {
+        res.sendStatus(403);
+    }
+
     await req.collections.transactions.deleteOne({ _id: ObjectId(id) });
 
     res.status(200).send({ message: "Transação apagada com sucesso" });
@@ -121,6 +129,10 @@ export const updateTransaction = async (req, res) => {
 
     if (!transaction) {
         res.sendStatus(404);
+    }
+
+    if (transaction.userId !== req.user._id) {
+        res.sendStatus(403);
     }
 
     await req.collections.transactions.updateOne(
