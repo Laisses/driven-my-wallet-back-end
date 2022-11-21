@@ -48,6 +48,14 @@ export const signIn = async (req, res) => {
     res.status(200).send({ token, username });
 };
 
+export const removeSession = async (req, res) => {
+    await req.collections.sessions.deleteOne({
+        userId: req.user._id,
+    });
+
+    res.sendStatus(200);
+};
+
 export const listTransactions = async (req, res) => {
     const user = req.user;
     const { limit } = req.query;
