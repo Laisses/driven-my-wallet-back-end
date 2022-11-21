@@ -31,14 +31,18 @@ export const authenticate = async (req, res, next) => {
     const token = authorization?.replace("Bearer ", "");
 
     if (!token) {
-        return res.sendStatus(401);
+        return res.status(401).send({
+            message: "Unauthorized"
+        });
     }
 
     const activeSession = await req.collections.sessions.findOne({ token });
     const activeUser = await req.collections.users.findOne({ _id: activeSession?.userId });
 
     if (!activeUser) {
-        return res.sendStatus(401);
+        return res.status(401).send({
+            message: "Unauthorized"
+        });
     }
 
     delete activeUser.password;
