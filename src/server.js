@@ -7,7 +7,7 @@ import { routes } from "./routes.js";
 dotenv.config();
 
 const app = express();
-const PORT = process.env.PORT;
+const PORT = process.env.PORT || 5000;
 const mongoClient = new MongoClient(process.env.DB_URI);
 
 app.use(cors());
