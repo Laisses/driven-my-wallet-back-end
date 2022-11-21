@@ -62,6 +62,7 @@ export const listTransactions = async (req, res) => {
 
     const userTransactions = await req.collections.transactions
         .find({ userId: user._id })
+        .sort({ date: -1 })
         .limit(Number(limit) || 0)
         .toArray();
 
