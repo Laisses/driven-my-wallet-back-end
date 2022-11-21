@@ -77,11 +77,15 @@ export const singleTransaction = async (req, res) => {
     });
 
     if (!transaction) {
-        res.sendStatus(404);
+        return res.status(404).send({
+            message: "Not Found"
+        });
     }
 
-    if (transaction.userId !== req.user._id) {
-        res.sendStatus(403);
+    if (!transaction.userId.equals(req.user._id)) {
+        return res.status(403).send({
+            message: "Forbidden"
+        });
     }
 
     res.status(200).send(transaction);
@@ -107,11 +111,15 @@ export const removeTransaction = async (req, res) => {
     });
 
     if (!transaction) {
-        res.sendStatus(404);
+        return res.status(404).send({
+            message: "Not Found"
+        });
     }
 
-    if (transaction.userId !== req.user._id) {
-        res.sendStatus(403);
+    if (!transaction.userId.equals(req.user._id)) {
+        return res.status(403).send({
+            message: "Forbidden"
+        });
     }
 
     await req.collections.transactions.deleteOne({ _id: ObjectId(id) });
@@ -128,11 +136,15 @@ export const updateTransaction = async (req, res) => {
     });
 
     if (!transaction) {
-        res.sendStatus(404);
+        return res.status(404).send({
+            message: "Not Found"
+        });
     }
 
-    if (transaction.userId !== req.user._id) {
-        res.sendStatus(403);
+    if (!transaction.userId.equals(req.user._id)) {
+        return res.status(403).send({
+            message: "Forbidden"
+        });
     }
 
     await req.collections.transactions.updateOne(
