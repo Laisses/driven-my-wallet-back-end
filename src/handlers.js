@@ -1,8 +1,6 @@
 import bcrypt from "bcrypt";
 import { ObjectId } from "mongodb";
 import { v4 as uuid } from "uuid";
-import { validator, userSchema, transactionSchema } from "./validator.js";
-
 
 export const signUp = async (req, res) => {
     const { username, email, password } = req.body;
@@ -11,13 +9,6 @@ export const signUp = async (req, res) => {
 
     if (userExists) {
         return res.status(409).send({ message: "this email is already registered" });
-    }
-
-    const { error } = validator(userSchema, req.body);
-
-    if (error) {
-        const errors = error.details.map(detail => detail.message);
-        return res.status(400).send(errors);
     }
 
     const hashPassword = bcrypt.hashSync(password, 10);

@@ -1,5 +1,4 @@
-import { validator, transactionSchema } from "./validator.js";
-
+import { validator } from "./schemas.js";
 
 export const collections = db => (req, _res, next) => {
     const users = db.collection("users");
@@ -15,9 +14,9 @@ export const collections = db => (req, _res, next) => {
     next();
 };
 
-export const validateTransactionSchema = (req, res, next) => {
-    const transaction = req.body;
-    const { error } = validator(transactionSchema, transaction);
+export const validate = schema => (req, res, next) => {
+    const payload = req.body;
+    const { error } = validator(schema, payload);
 
     if (error) {
         const errors = error.details.map((detail) => detail.message);
