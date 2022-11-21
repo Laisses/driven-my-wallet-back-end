@@ -1,4 +1,5 @@
 import express from "express";
+import morgan from "morgan";
 import cors from "cors";
 import dotenv from "dotenv";
 import { MongoClient } from "mongodb";
@@ -12,6 +13,7 @@ const mongoClient = new MongoClient(process.env.DB_URI);
 app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended:true }));
+app.use(morgan("combined"));
 
 const main = async () => {
     await mongoClient.connect();
